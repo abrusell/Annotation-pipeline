@@ -30,6 +30,10 @@ else
 	flag=
 fi
 
+# Lancio Intervar sul vcforig
+cp /pico/work/IscrC_FoRWArDS_1/NGS_tools/InterVar/config.ini $outdir
+$Intervar -b hg19 -i $vcforig -o $outdir$ID &
+
 # con SnpSift annotate riempo il campo ID con il dbSNP e la frequenza (CAF)
 java -Xmx64g -jar /pico/home/userexternal/abrusell/snpEff/SnpSift.jar annotate -info CAF $dbSNP_file $vcfinput > $outdir$ID"_raw_snps-indels_HapCall_genotype_filtered"$flag".g.dbSNP.vcf" 2>> $outdir$ID"_ANNOT_log"
 
@@ -134,8 +138,11 @@ java -Xmx64g -jar /pico/home/userexternal/abrusell/snpEff/SnpSift.jar annotate -
 
 mv $outdir$ID"_raw_snps-indels_HapCall_genotype_filtered"$flag".g.SnpEff_UCSCAnnot_dbNSFP2.dbNSFP3_gene_cadd"$spid"_ACMG_DDG2P_Mendel_HGMD.vcf" $outdir$ID"_raw_snps-indels_HapCall_genotype_filtered"$flag".g.SnpEff_UCSCAnnot_dbNSFP2.dbNSFP3_gene_cadd"$spid"_ACMG_DDG2P_Mendel.vcf"
 
+# Annoto l'interpretazione clinica di Intervar 
+python /pico/work/IscrC_FoRWArDS_1/NGS_tools/intervar_annotator.py $outdir$ID"_raw_snps-indels_HapCall_genotype_filtered"$flag".g.SnpEff_UCSCAnnot_dbNSFP2.dbNSFP3_gene_cadd"$spid"_ACMG_DDG2P_Mendel.vcf" $outdir$ID".hg19_multianno.txt.intervar" 1>> $outdir$ID"_custAnnot_log" 2>&1
+
 # annoto ricorrenza del singolo vcf
-/pico/work/IscrC_FoRWArDS_1/NGS_tools/run_varDBannotator $outdir$ID"_raw_snps-indels_HapCall_genotype_filtered"$flag".g.SnpEff_UCSCAnnot_dbNSFP2.dbNSFP3_gene_cadd"$spid"_ACMG_DDG2P_Mendel.vcf" 1>> $outdir$ID"_custAnnot_log" 2>&1
+/pico/work/IscrC_FoRWArDS_1/NGS_tools/run_varDBannotator $outdir$ID"_raw_snps-indels_HapCall_genotype_filtered"$flag".g.SnpEff_UCSCAnnot_dbNSFP2.dbNSFP3_gene_cadd"$spid"_ACMG_DDG2P_Mendel_intervar.vcf" 1>> $outdir$ID"_custAnnot_log" 2>&1
 
 # ora inserisco la parte di prioritizzazione delle varianti sinonime con silva
 # ripulisco il vcf dagli aplotipi e contig non mappati univocamente su GRCh38.23complGencode, altrimenti il programma non va
